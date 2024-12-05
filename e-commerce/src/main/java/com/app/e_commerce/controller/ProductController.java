@@ -13,6 +13,7 @@ import java.util.Optional;
 
 @RestController
 @RequestMapping("/api/v1/products")
+@CrossOrigin(origins = "http://localhost:4200")
 public class ProductController {
 
     private final IProductService productService;
@@ -33,7 +34,7 @@ public class ProductController {
             return ResponseEntity.badRequest().body("El nombre y el precio no pueden estar vacios");
         }
 
-        //Codificar la imagen a Base64
+        /*//Codificar la imagen a Base64
         String base64Image = Base64.getEncoder().encodeToString(productDTO.getImg().getBytes());
 
         //Limitar el tamaño de la imagen a 2MB
@@ -44,14 +45,14 @@ public class ProductController {
         //Verificar el formato
        // if(!isValidImageFormat(productDTO.getImg())){
        //     return ResponseEntity.badRequest().body("El formato de la imagen no es válido. Solo se aceptan imágenes PNG y JPG. ");
-       // }
+       // }*/
 
         Product product = Product.builder()
                 .name(productDTO.getName())
                 .description(productDTO.getDescription())
                 .price(productDTO.getPrice())
                 .stock(productDTO.getStock())
-                .img(base64Image)
+                .img(productDTO.getImg())
                 .isSale(productDTO.getIsSale())
                 .isNew(productDTO.getIsNew())
                 .build();
@@ -59,12 +60,12 @@ public class ProductController {
         return ResponseEntity.created(new URI("/api/v1/products")).body(product);
     }
 
-    //Validar el formato de la img
+    /*Validar el formato de la img
     private boolean isValidImageFormat(String base64Image){
         //Obtener el prefijo de la imagen y verificar que sea PNG o JPG
         String imagePrefix = base64Image.split(",")[0];
         return imagePrefix.startsWith("data:image/png") || imagePrefix.startsWith("data:image/jpeg");
-    }
+    }*/
 
     @GetMapping("")
     public  ResponseEntity<Object> getAllProducts (){
@@ -76,7 +77,7 @@ public class ProductController {
                         .description(product.getDescription())
                         .price(product.getPrice())
                         .stock(product.getStock())
-                        .img(encodeToBase64(product.getImg().getBytes()))
+                        .img(product.getImg())
                         .isSale(product.getIsSale())
                         .isNew(product.getIsNew())
                         .build())
@@ -84,9 +85,9 @@ public class ProductController {
         return ResponseEntity.ok(productDTOList);
     }
 
-    private String encodeToBase64(byte[] imageBytes){
+    /*private String encodeToBase64(byte[] imageBytes){
         return "data:image/png;base64," + Base64.getEncoder().encodeToString(imageBytes);
-    }
+    }*/
 
     @GetMapping("/find/{id}")
     public ResponseEntity<Object> findProduct (@PathVariable Long id){
@@ -144,7 +145,7 @@ public class ProductController {
 
         productService.deleteProduct(id);
 
-        return  ResponseEntity.ok("Producto eliminado");
+        return  ResponseEntity.ok(product.getName()+ " eliminado");
     }
 
 }
